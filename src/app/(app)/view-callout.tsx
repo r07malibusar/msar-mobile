@@ -21,7 +21,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import KeyboardAvoidingCustomView from '@/components/KeyboardAvoidingCustomView';
 import useAuth from '@/hooks/useAuth';
 import { useCalloutLogMutation } from '@/remote/mutation';
-import { calloutLogQueryKey, calloutQueryKey, useCalloutLogInfiniteQuery, useCalloutQuery, useCalloutResponsesAvailableMap } from '@/remote/query';
+import { calloutLogQueryKey, calloutQueryKey, useCalloutLogInfiniteQuery, useCalloutQuery, useCalloutResponsesAvailableMap, useOperationTypesAvailableQuery } from '@/remote/query';
 import { calloutResponseBadge } from '@/types/callout';
 import { calloutStatus } from '@/types/enums';
 import { calloutResponseSuccessNotification } from '@/utility/pushNotifications';
@@ -58,7 +58,8 @@ function Page() {
 
   const calloutResponseKey = ['calloutResponse', idInt];
   const calloutResponseMutation = useMutation({
-    mutationFn: (variables: calloutResponse) => api.apiRespondToCallout(variables.idInt, variables.text),
+    mutationFn: (variables: calloutResponse) =>
+      api.apiRespondToCallout(variables.idInt, variables.text, variables.start_time, variables.end_time),
     mutationKey: calloutResponseKey,
     onSuccess: (_result, variables, _context) => {
       msarEventEmitter.emit('refreshCallout', { id: idInt });
@@ -79,8 +80,14 @@ function Page() {
   });
 
   const calloutLogMutation = useCalloutLogMutation(idInt);
+  const operationTypesAvailableQuery = useOperationTypesAvailableQuery();
 
   const callout = calloutQuery.data;
+  const currentOpType = operationTypesAvailableQuery.data?.results?.find(
+    (o: any) => o.name?.toLowerCase() === callout?.operation_type?.toLowerCase(),
+  );
+  const responseTimeMode = currentOpType?.response_time_mode ?? 'promised_time';
+
   const headerTitle = callout ? callout.title : title;
   const logBadge = badgeString(callout?.log_count);
   const fileBadge = badgeString(callout?.files?.length);
@@ -154,18 +161,20 @@ function Page() {
     refreshCallout();
   };
 
-  const responseSelected = (response: string) => {
-    console.log('selected response', response);
-    submitCalloutResponse(response);
+  const responseSelected = (payload: { text: string; start_time?: string | null; end_time?: string | null }) => {
+    console.log('selected response', payload);
+    submitCalloutResponse(payload);
     setModalVisible(false);
   };
 
-  const submitCalloutResponse = async (responseString: string) => {
+  const submitCalloutResponse = async (payload: { text: string; start_time?: string | null; end_time?: string | null }) => {
     const idInt: number = Number.parseInt(id);
     calloutResponseMutation.mutate(
       {
         idInt,
-        text: responseString,
+        text: payload.text,
+        start_time: payload.start_time,
+        end_time: payload.end_time,
       },
     );
   };
@@ -249,6 +258,8 @@ function Page() {
       </SafeAreaView>
       <CalloutRespondModal
         modalVisible={modalVisible}
+        responseTimeMode={responseTimeMode}
+        myResponse={callout?.my_response ?? null}
         onSelect={responseSelected}
         onCancel={() => setModalVisible(false)}
       />

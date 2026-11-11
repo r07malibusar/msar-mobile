@@ -6,7 +6,7 @@ import colors, { textColorForBackground } from '@styles/colors';
 import { elements } from '@styles/elements';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useCalloutResponsesAvailableQuery } from '@/remote/query';
+import { useCalloutResponsesAvailableQuery, useOperationTypesAvailableQuery } from '@/remote/query';
 
 interface CalloutPersonnelTabProps {
   callout: callout;
@@ -14,6 +14,12 @@ interface CalloutPersonnelTabProps {
 
 function CalloutPersonnelTab({ callout }: CalloutPersonnelTabProps) {
   const calloutResponesQuery = useCalloutResponsesAvailableQuery();
+  const operationTypesQuery = useOperationTypesAvailableQuery();
+
+  const currentOpType = operationTypesQuery.data?.results?.find(
+    (o: any) => o.name?.toLowerCase() === callout?.operation_type?.toLowerCase(),
+  );
+  const responseTimeMode = currentOpType?.response_time_mode ?? 'promised_time';
 
   let responses: opResponse[] = [];
   if (callout.operational_periods && callout.operational_periods[0]) {
@@ -38,7 +44,6 @@ function CalloutPersonnelTab({ callout }: CalloutPersonnelTabProps) {
         backgroundColor,
         textColor: textColorForBackground(backgroundColor),
         responses: filtered,
-
       });
     });
   }
@@ -65,7 +70,11 @@ function CalloutPersonnelTab({ callout }: CalloutPersonnelTabProps) {
 
                 return (
                   <React.Fragment key={opResponse.member.id}>
-                    <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
+                    <PersonnelField
+                      key={opResponse.member.id}
+                      opResponse={opResponse}
+                      responseTimeMode={responseTimeMode}
+                    />
                     {addDiv
                       && <View style={elements.informationDiv} />}
                   </React.Fragment>

@@ -30,7 +30,7 @@ export interface callout {
   created_by?: user;
   log_count?: number;
   log_last_id?: number;
-};
+}
 
 export function calloutFromResponse(data: any): callout {
   return {
@@ -48,8 +48,19 @@ export function calloutFromResponse(data: any): callout {
     status: stringToCalloutStatus(data.status),
     resolution: data.resolution,
     location: data.location,
-    operational_periods: data.operational_periods,
-    files: data.files.map(dataFileFromResponse),
+    operational_periods: data.operational_periods?.map((op: any) => ({
+      ...op,
+      responses: op.responses?.map((r: any) => ({
+        ...r,
+        start_time: r.start_time ? new Date(r.start_time) : undefined,
+        end_time: r.end_time ? new Date(r.end_time) : undefined,
+        signed_in_at: r.signed_in_at ? new Date(r.signed_in_at) : undefined,
+        signed_out_at: r.signed_out_at ? new Date(r.signed_out_at) : undefined,
+        created_at: r.created_at ? new Date(r.created_at) : (r.signed_in_at ? new Date(r.signed_in_at) : undefined),
+        updated_at: r.updated_at ? new Date(r.updated_at) : undefined,
+      })),
+    })),
+    files: data.files?.map(dataFileFromResponse) ?? [],
     handling_unit: data.handling_unit,
     created_at: new Date(data.created_at),
     my_response: data.my_response,

@@ -277,13 +277,18 @@ export class Api {
     );
   }
 
-  async apiRespondToCallout(id: number, response: string): Promise<any> {
+  async apiRespondToCallout(id: number, response: string, startTime?: string | null, endTime?: string | null): Promise<any> {
+    const payload: any = { response };
+    if (startTime !== undefined) {
+      payload.start_time = startTime;
+    }
+    if (endTime !== undefined) {
+      payload.end_time = endTime;
+    }
     return this.#fetchJsonWithCredentials(
       `${(this.#calloutsEndpoint()) + id}/respond/`,
       'POST',
-      {
-        response,
-      },
+      payload,
     );
   }
 

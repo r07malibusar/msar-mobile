@@ -7,12 +7,13 @@ interface LargeButtonProps {
   backgroundColor: string;
   textColor?: string;
   onPress: () => void;
+  onLongPress?: () => void;
 };
 
-function LargeButton({ title, backgroundColor, textColor, onPress }: LargeButtonProps) {
+function LargeButton({ title, backgroundColor, textColor, onPress, onLongPress }: LargeButtonProps) {
   return (
 
-    <TouchableOpacity activeOpacity={0.5} onPress={onPress}>
+    <TouchableOpacity activeOpacity={0.5} onPress={onPress} onLongPress={onLongPress}>
       <View style={[styles.container, { backgroundColor }]}>
         <Text style={[elements.mediumText, { color: textColor, paddingVertical: 8, fontWeight: '500', textAlign: 'center' }]}>{title}</Text>
       </View>
