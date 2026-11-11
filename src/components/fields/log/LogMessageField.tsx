@@ -4,7 +4,7 @@ import { elements } from '@styles/elements';
 import { getConditionalTimeString } from '@utility/dateHelper';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Autolink, LatLngMatcher } from 'react-native-autolink';
+import GeoLocationText from '@/components/fields/GeoLocationText';
 import useAuth from '@/hooks/useAuth';
 import { useChatOrCalloutLogMutation } from '@/remote/mutation';
 import { logStatusType } from '@/types/enums';
@@ -17,7 +17,7 @@ interface LogMessageFieldProps {
   message: string;
   status: string;
   timestamp: Date;
-};
+}
 
 function LogMessageField({ id, callout_id, member, message, status, timestamp }: LogMessageFieldProps) {
   const logMutation = useChatOrCalloutLogMutation(callout_id);
@@ -39,15 +39,12 @@ function LogMessageField({ id, callout_id, member, message, status, timestamp }:
             {userToString(member)}
           </Text>
         )}
-      <Autolink
+      <GeoLocationText
+        text={message}
         style={[styles.messageText, {
           textAlign: isSelf ? 'right' : 'left',
         }]}
         selectable
-        email
-        phone
-        matchers={[LatLngMatcher]}
-        text={message}
       />
       <Text
         selectable
@@ -80,7 +77,6 @@ function LogMessageField({ id, callout_id, member, message, status, timestamp }:
 }
 
 const styles = StyleSheet.create({
-
   container: {
     marginVertical: 16,
     paddingHorizontal: 20,
@@ -102,7 +98,6 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: colors.primaryText,
   },
-
   messageAuthor: {
     marginVertical: 8,
     fontSize: 14,

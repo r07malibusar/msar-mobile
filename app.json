@@ -67,6 +67,7 @@
           "iosNSEFilePath": "./src/assets/native/NotificationService.m"
         }
       ],
+      "./plugins/w3w-expo-plugin.js",
       "expo-router",
       "@react-native-firebase/app",
       "@react-native-firebase/messaging",

@@ -5,15 +5,16 @@ import { elements } from '@styles/elements';
 import { coordinateFromString, nullCoordinate } from '@utility/locationHeler';
 import * as Clipboard from 'expo-clipboard';
 import React from 'react';
-import { Linking, Platform, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import GeoLocationText from '@/components/fields/GeoLocationText';
 import { locationType } from '@/types/enums';
 import { locationCoordinatesToString, locationToShortString, locationToString } from '@/types/location';
 import SmallButton from '../inputs/SmallButton';
 
 interface LocationFieldProps {
   location: location;
-};
+}
 
 function LocationField({ location }: LocationFieldProps) {
   let locType: locationType | null = null;
@@ -59,7 +60,12 @@ function LocationField({ location }: LocationFieldProps) {
   return (
     <View style={styles.container}>
       {locType === locationType.DESCRIPTION
-        && <Text style={[elements.mediumText, { padding: 8 }]}>{location.text}</Text>}
+        && (
+          <GeoLocationText
+            text={location.text}
+            style={[elements.mediumText, { padding: 8 }]}
+          />
+        )}
 
       {(locType === locationType.COORDINATES || locType === locationType.ADDRESS)
         && (
@@ -75,20 +81,23 @@ function LocationField({ location }: LocationFieldProps) {
                   />
                 )}
             </MapView>
-            <Text style={[elements.smallText, { margin: 16 }]} selectable>
-              {locationToString(location)}
-            </Text>
+            <GeoLocationText
+              text={locationToString(location)}
+              style={[elements.smallText, { margin: 16 }]}
+            />
             {(locType === locationType.ADDRESS) && !!coordinates.latitude
               && (
-                <Text style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]} selectable>
-                  {locationCoordinatesToString(location)}
-                </Text>
+                <GeoLocationText
+                  text={locationCoordinatesToString(location)}
+                  style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]}
+                />
               )}
             {location.text
               && (
-                <Text style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]} selectable>
-                  {location.text}
-                </Text>
+                <GeoLocationText
+                  text={location.text}
+                  style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]}
+                />
               )}
             <View style={styles.buttonTray}>
               <SmallButton
@@ -114,7 +123,6 @@ function LocationField({ location }: LocationFieldProps) {
 }
 
 const styles = StyleSheet.create({
-
   container: {
     paddingHorizontal: 0,
     paddingVertical: 0,

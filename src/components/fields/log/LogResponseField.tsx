@@ -3,6 +3,7 @@ import colors from '@styles/colors';
 import { getConditionalTimeString, getTimeString } from '@utility/dateHelper';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import GeoLocationText from '@/components/fields/GeoLocationText';
 import { useCalloutResponsesAvailableMap } from '@/remote/query';
 import { colorForResponseType } from '@/types/calloutSummary';
 import { userToString } from '@/types/user';
@@ -26,14 +27,14 @@ function LogResponseField({ member, response, timestamp, startTime, endTime }: L
     extraTimeStr = ` (End Time: ${getTimeString(endTime)})`;
   }
 
+  const fullText = `${userToString(member)} responded ${response}${extraTimeStr}`;
+
   return (
     <View style={styles.container}>
-      <Text style={[styles.valueText, { color: colorForResponseType(response, calloutResponseMap) }]}>
-        {userToString(member)}
-        {' responded '}
-        {response}
-        {extraTimeStr}
-      </Text>
+      <GeoLocationText
+        text={fullText}
+        style={[styles.valueText, { color: colorForResponseType(response, calloutResponseMap) }]}
+      />
       <Text style={styles.logTimestamp}>
         {getConditionalTimeString(timestamp)}
       </Text>
