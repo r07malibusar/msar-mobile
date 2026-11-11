@@ -43,12 +43,10 @@ export function openMapsApp(lat: number, lon: number, labelText?: string) {
   }
 }
 
-/** Open CalTopo mobile app (or fallback to CalTopo web map) */
+/** Open CalTopo map URL */
 export function openCalTopo(lat: number, lon: number) {
-  const caltopoUrl = `caltopo://ll?lat=${lat}&lon=${lon}`;
-  const caltopoWebUrl = `https://caltopo.com/map.html#ll=${lat},${lon}&z=15`;
-
-  Linking.openURL(caltopoUrl).catch(() => {
-    Linking.openURL(caltopoWebUrl);
+  const caltopoUrl = `https://caltopo.com/map.html#ll=${lat},${lon}&z=14&b=imagery`;
+  Linking.openURL(caltopoUrl).catch((err) => {
+    console.log('Error opening CalTopo:', err);
   });
 }
