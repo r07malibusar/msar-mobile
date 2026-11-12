@@ -2,18 +2,18 @@ import type { GeoPoint } from './w3w';
 
 export interface TextToken {
   text: string;
-  isGeoPoint: boolean;
+  type: 'text' | 'w3w' | 'decimal' | 'ddm' | 'phone' | 'email' | 'url';
   geoPoint?: GeoPoint;
+  linkUrl?: string;
 }
 
-// Regex for What3Words: optional "///", "w3w.", "w3w/", "w3w:" followed by 3 dot-separated words
+// Regex patterns
 const W3W_REGEX = /(?:\/\/\/|w3w[./]|w3w:|\b)([a-z]{2,})\.([a-z]{2,})\.([a-z]{2,})\b/gi;
-
-// Regex for Decimal Coordinates: e.g. 34.22323 -118.123232 or 34.22323, -118.123232
 const DECIMAL_GPS_REGEX = /\b([-+]?(?:[0-8]?\d\.\d{3,}|90\.0+))[, ]+([-+]?(?:1[0-7]\d|\d)\.\d{3,}|180\.0+)\b/g;
-
-// Regex for DDM (Degrees Decimal Minutes): e.g. 34° 13.3938' N, 118° 07.3939' W or N 34 13.394 W 118 07.394
 const DDM_GPS_REGEX = /\b([NS]?\d{1,2}°?\d{1,2}\.\d+'?[NS]?)[, ]+([EW]?\d{1,3}°?\d{1,2}\.\d+'?[EW]?)\b/gi;
+const US_PHONE_REGEX = /(?:\+?1[-. ]?)?\(?([2-9]\d{2})\)?[-. ]?(\d{3})[-. ]?(\d{4})\b/g;
+const EMAIL_REGEX = /\b[\w.%+-]+@[\w.-]+\.[A-Z]{2,}\b/gi;
+const URL_REGEX = /\b(?:https?:\/\/|www\.)[^\s<]+\b/gi;
 
 function parseDDMString(ddmStr: string): { latitude: number; longitude: number } | null {
   try {
@@ -50,7 +50,7 @@ function parseDDMString(ddmStr: string): { latitude: number; longitude: number }
 
 export function parseGeoPoints(input: string): TextToken[] {
   if (!input) {
-    return [{ text: '', isGeoPoint: false }];
+    return [{ text: '', type: 'text' }];
   }
 
   const matches: Array<{ start: number; end: number; token: TextToken }> = [];
@@ -69,7 +69,7 @@ export function parseGeoPoints(input: string): TextToken[] {
       end: match.index + rawText.length,
       token: {
         text: rawText,
-        isGeoPoint: true,
+        type: 'w3w',
         geoPoint: {
           rawText,
           type: 'w3w',
@@ -96,7 +96,7 @@ export function parseGeoPoints(input: string): TextToken[] {
         end: match.index + rawText.length,
         token: {
           text: rawText,
-          isGeoPoint: true,
+          type: 'decimal',
           geoPoint: {
             rawText,
             type: 'decimal',
@@ -121,7 +121,7 @@ export function parseGeoPoints(input: string): TextToken[] {
         end: match.index + rawText.length,
         token: {
           text: rawText,
-          isGeoPoint: true,
+          type: 'ddm',
           geoPoint: {
             rawText,
             type: 'ddm',
@@ -132,6 +132,60 @@ export function parseGeoPoints(input: string): TextToken[] {
       });
     }
     match = ddmRegexCopy.exec(input);
+  }
+
+  // 4. Match US Phone Numbers
+  const phoneRegexCopy = new RegExp(US_PHONE_REGEX);
+  match = phoneRegexCopy.exec(input);
+  while (match != null) {
+    const rawText = match[0];
+    const digits = rawText.replace(/\D/g, '');
+    const phoneDigits = digits.length === 10 ? `1${digits}` : digits;
+    matches.push({
+      start: match.index,
+      end: match.index + rawText.length,
+      token: {
+        text: rawText,
+        type: 'phone',
+        linkUrl: `tel:${phoneDigits}`,
+      },
+    });
+    match = phoneRegexCopy.exec(input);
+  }
+
+  // 5. Match Emails
+  const emailRegexCopy = new RegExp(EMAIL_REGEX);
+  match = emailRegexCopy.exec(input);
+  while (match != null) {
+    const rawText = match[0];
+    matches.push({
+      start: match.index,
+      end: match.index + rawText.length,
+      token: {
+        text: rawText,
+        type: 'email',
+        linkUrl: `mailto:${rawText}`,
+      },
+    });
+    match = emailRegexCopy.exec(input);
+  }
+
+  // 6. Match URLs
+  const urlRegexCopy = new RegExp(URL_REGEX);
+  match = urlRegexCopy.exec(input);
+  while (match != null) {
+    const rawText = match[0];
+    const href = rawText.startsWith('www.') ? `https://${rawText}` : rawText;
+    matches.push({
+      start: match.index,
+      end: match.index + rawText.length,
+      token: {
+        text: rawText,
+        type: 'url',
+        linkUrl: href,
+      },
+    });
+    match = urlRegexCopy.exec(input);
   }
 
   // Sort matches by start position & remove overlapping matches
@@ -146,7 +200,7 @@ export function parseGeoPoints(input: string): TextToken[] {
   }
 
   if (filteredMatches.length === 0) {
-    return [{ text: input, isGeoPoint: false }];
+    return [{ text: input, type: 'text' }];
   }
 
   const tokens: TextToken[] = [];
@@ -156,7 +210,7 @@ export function parseGeoPoints(input: string): TextToken[] {
     if (m.start > currentIndex) {
       tokens.push({
         text: input.substring(currentIndex, m.start),
-        isGeoPoint: false,
+        type: 'text',
       });
     }
     tokens.push(m.token);
@@ -166,7 +220,7 @@ export function parseGeoPoints(input: string): TextToken[] {
   if (currentIndex < input.length) {
     tokens.push({
       text: input.substring(currentIndex),
-      isGeoPoint: false,
+      type: 'text',
     });
   }
 

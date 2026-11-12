@@ -1,8 +1,9 @@
 import type { GeoPoint } from '@/utility/w3w';
-import React, { useMemo, useState } from 'react';
-import { Autolink, PhoneMatchersByCountry } from 'react-native-autolink';
+import colors from '@styles/colors';
+import React, { useState } from 'react';
+import { Linking, StyleSheet, Text } from 'react-native';
 import LocationActionModal from '@/components/modals/LocationActionModal';
-import { createGeoMatchers } from '@/utility/geoAutolinkMatchers';
+import { parseGeoPoints } from '@/utility/geoTextParser';
 
 interface GeoLocationTextProps {
   text?: string | null;
@@ -14,32 +15,58 @@ export default function GeoLocationText({ text, style, selectable = true }: GeoL
   const [selectedGeoPoint, setSelectedGeoPoint] = useState<GeoPoint | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  const handleGeoPress = (geoPoint: GeoPoint) => {
-    setSelectedGeoPoint(geoPoint);
-    setModalVisible(true);
-  };
-
-  const matchers = useMemo(() => {
-    const geoMatchers = createGeoMatchers(handleGeoPress);
-    // Applying the US phone matcher so generic 10 digit numbers get parsed as phone numbers
-    return [...geoMatchers, PhoneMatchersByCountry.US];
-  }, []);
-
   if (!text) {
     return null;
   }
 
+  const tokens = parseGeoPoints(text);
+
+  const handleGeoPress = (geoPoint?: GeoPoint) => {
+    if (geoPoint) {
+      setSelectedGeoPoint(geoPoint);
+      setModalVisible(true);
+    }
+  };
+
+  const handleLinkPress = (url?: string) => {
+    if (url) {
+      Linking.openURL(url).catch((err) => {
+        console.log('Error opening link:', err);
+      });
+    }
+  };
+
   return (
     <>
-      <Autolink
-        text={text}
-        style={style}
-        selectable={selectable}
-        email
-        phone
-        url={{ schemeMatches: true, wwwMatches: true, tldMatches: false }}
-        matchers={matchers}
-      />
+      <Text style={style} selectable={selectable}>
+        {tokens.map((token) => {
+          if ((token.type === 'w3w' || token.type === 'decimal' || token.type === 'ddm') && token.geoPoint) {
+            return (
+              <Text
+                key={`geo-link-${token.text}-${token.geoPoint.type}-${token.geoPoint.rawText}`}
+                style={styles.geoLink}
+                onPress={() => handleGeoPress(token.geoPoint)}
+              >
+                {token.text}
+              </Text>
+            );
+          }
+
+          if ((token.type === 'phone' || token.type === 'email' || token.type === 'url') && token.linkUrl) {
+            return (
+              <Text
+                key={`link-${token.type}-${token.text}-${token.linkUrl}`}
+                style={styles.standardLink}
+                onPress={() => handleLinkPress(token.linkUrl)}
+              >
+                {token.text}
+              </Text>
+            );
+          }
+
+          return token.text;
+        })}
+      </Text>
 
       {modalVisible && selectedGeoPoint && (
         <LocationActionModal
@@ -54,3 +81,15 @@ export default function GeoLocationText({ text, style, selectable = true }: GeoL
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  geoLink: {
+    color: colors.secondaryYellow,
+    textDecorationLine: 'underline',
+    fontWeight: '600',
+  },
+  standardLink: {
+    color: colors.selectionBg,
+    textDecorationLine: 'underline',
+  },
+});

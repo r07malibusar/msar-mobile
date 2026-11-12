@@ -2,10 +2,6 @@ import type { CustomMatcher } from 'react-native-autolink';
 import type { GeoPoint } from './w3w';
 import colors from '@styles/colors';
 
-const W3W_REGEX = /(?:\/\/\/|w3w[./]|w3w:|\b)([a-z]{2,})\.([a-z]{2,})\.([a-z]{2,})\b/gi;
-const DECIMAL_GPS_REGEX = /\b([-+]?(?:[0-8]?\d\.\d{3,}|90\.0+))[, ]+([-+]?(?:1[0-7]\d|\d)\.\d{3,}|180\.0+)\b/g;
-const DDM_GPS_REGEX = /\b([NS]?\d{1,2}°?\d{1,2}\.\d+'?[NS]?)[, ]+([EW]?\d{1,3}°?\d{1,2}\.\d+'?[EW]?)\b/gi;
-
 function parseDDMString(ddmStr: string): { latitude: number; longitude: number } | null {
   try {
     let latSign = 1;
@@ -47,7 +43,9 @@ export function createGeoMatchers(onGeoPress: (geoPoint: GeoPoint) => void): Cus
   };
 
   const w3wMatcher: CustomMatcher = {
-    pattern: W3W_REGEX,
+    get pattern() {
+      return /(?:\/\/\/|w3w[./]|w3w:|\b)([a-z]{2,})\.([a-z]{2,})\.([a-z]{2,})\b/gi;
+    },
     type: 'w3w',
     style: linkStyle,
     onPress: (match) => {
@@ -68,7 +66,9 @@ export function createGeoMatchers(onGeoPress: (geoPoint: GeoPoint) => void): Cus
   };
 
   const decimalGpsMatcher: CustomMatcher = {
-    pattern: DECIMAL_GPS_REGEX,
+    get pattern() {
+      return /\b([-+]?(?:[0-8]?\d\.\d{3,}|90\.0+))[, ]+([-+]?(?:1[0-7]\d|\d)\.\d{3,}|180\.0+)\b/g;
+    },
     type: 'decimalGps',
     style: linkStyle,
     onPress: (match) => {
@@ -88,7 +88,9 @@ export function createGeoMatchers(onGeoPress: (geoPoint: GeoPoint) => void): Cus
   };
 
   const ddmGpsMatcher: CustomMatcher = {
-    pattern: DDM_GPS_REGEX,
+    get pattern() {
+      return /\b([NS]?\d{1,2}°?\d{1,2}\.\d+'?[NS]?)[, ]+([EW]?\d{1,3}°?\d{1,2}\.\d+'?[EW]?)\b/gi;
+    },
     type: 'ddmGps',
     style: linkStyle,
     onPress: (match) => {

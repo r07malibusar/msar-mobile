@@ -76,7 +76,7 @@ export default function CoordinateConverterScreen() {
     }
 
     const tokens = parseGeoPoints(inputText);
-    const firstGeoToken = tokens.find(t => t.isGeoPoint && t.geoPoint);
+    const firstGeoToken = tokens.find(t => t.geoPoint);
 
     if (firstGeoToken?.geoPoint) {
       const point = { ...firstGeoToken.geoPoint };
