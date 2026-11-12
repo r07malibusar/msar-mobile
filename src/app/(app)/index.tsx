@@ -72,7 +72,7 @@ function Page() {
   const items: Items[] = [
     { text: 'Callouts', icon: 'car-emergency', url: '/callout-list', badge: numberActiveCallouts },
     { text: 'Messages', icon: 'forum-outline', url: '/chat', badge: chatHasUnread ? '!' : undefined },
-    { text: 'You are Here', icon: 'crosshairs-gps', url: '/you-are-here' },
+    { text: 'Coordinates', icon: 'crosshairs-gps', url: '/coordinate-converter' },
     { text: 'Roster', icon: 'account-multiple-outline', url: '/roster' },
     { text: 'Certs', icon: 'certificate', url: '/certs' },
     { text: 'Calendar', icon: 'calendar', url: '/calendar' },

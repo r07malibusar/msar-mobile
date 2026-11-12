@@ -1,5 +1,6 @@
 import type { Api } from '@/remote/api';
 import messaging from '@react-native-firebase/messaging';
+import * as Sentry from '@sentry/react-native';
 
 async function getPushToken(): Promise<string | null> {
   try {
@@ -8,6 +9,7 @@ async function getPushToken(): Promise<string | null> {
   catch (error) {
     // dev mode fallback
     console.warn('Firebase Messaging token error:', error);
+    Sentry.captureException(error);
     return null;
   }
 }
@@ -37,6 +39,7 @@ export async function checkPushToken(api: Api): Promise<boolean> {
   }
   catch (error) {
     console.warn('Check push token error:', error);
+    Sentry.captureException(error);
     return false;
   }
 }
@@ -50,5 +53,6 @@ export async function removePushToken(api: Api) {
   }
   catch (error) {
     console.warn('Remove push token error:', error);
+    Sentry.captureException(error);
   }
 }

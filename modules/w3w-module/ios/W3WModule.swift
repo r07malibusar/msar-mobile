@@ -49,8 +49,8 @@ public class W3WModule: Module {
       guard let sdk = self.sdk else {
         throw Exception(name: "W3WEngineNil", description: "What3Words offline engine is not initialized (w3w-data.zip missing or license invalid)")
       }
-
-      let cleanWords = words.replacingOccurrences(of: "^///", with: "", options: .regularExpression).trimmingCharacters(in: .whitespacesAndNewlines)
+      //sometimes the string starts with w3w: or w3w.
+      let cleanWords = words.replacingOccurrences(of: "^(?:///|w3w[./]|w3w:)", with: "", options: [.regularExpression, .caseInsensitive]).trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
       do {
         if let coords = try sdk.convertToCoordinates(words: cleanWords) {
           return [

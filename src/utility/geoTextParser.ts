@@ -6,8 +6,8 @@ export interface TextToken {
   geoPoint?: GeoPoint;
 }
 
-// Regex for What3Words: optional "///" followed by 3 dot-separated words
-const W3W_REGEX = /(?:\/\/\/|\b)([a-z]{2,})\.([a-z]{2,})\.([a-z]{2,})\b/gi;
+// Regex for What3Words: optional "///", "w3w.", "w3w/", "w3w:" followed by 3 dot-separated words
+const W3W_REGEX = /(?:\/\/\/|w3w[./]|w3w:|\b)([a-z]{2,})\.([a-z]{2,})\.([a-z]{2,})\b/gi;
 
 // Regex for Decimal Coordinates: e.g. 34.22323 -118.123232 or 34.22323, -118.123232
 const DECIMAL_GPS_REGEX = /\b([-+]?(?:[0-8]?\d\.\d{3,}|90\.0+))[, ]+([-+]?(?:1[0-7]\d|\d)\.\d{3,}|180\.0+)\b/g;
@@ -60,7 +60,10 @@ export function parseGeoPoints(input: string): TextToken[] {
   let match = w3wRegexCopy.exec(input);
   while (match != null) {
     const rawText = match[0];
-    const w3wWords = `///${match[1]}.${match[2]}.${match[3]}`;
+    const word1 = (match[1] || '').toLowerCase();
+    const word2 = (match[2] || '').toLowerCase();
+    const word3 = (match[3] || '').toLowerCase();
+    const w3wWords = `///${word1}.${word2}.${word3}`;
     matches.push({
       start: match.index,
       end: match.index + rawText.length,

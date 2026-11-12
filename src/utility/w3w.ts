@@ -8,9 +8,9 @@ export interface GeoPoint {
   w3wWords?: string;
 }
 
-/** Convert What3Words 3-word string (e.g. "filled.count.soap" or "///filled.count.soap") to coordinates using offline engine */
+/** Convert What3Words 3-word string (e.g. "filled.count.soap", "///filled.count.soap", or "W3w.what.three.words") to coordinates using offline engine */
 export async function convertW3WToCoordinates(words: string): Promise<{ latitude: number; longitude: number; words: string } | null> {
-  const cleanWords = words.replace(/^\/\/\//, '').trim();
+  const cleanWords = words.replace(/^(?:\/\/\/|w3w[./]|w3w:)/i, '').trim().toLowerCase();
   if (!cleanWords) {
     return null;
   }

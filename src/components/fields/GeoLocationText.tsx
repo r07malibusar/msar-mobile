@@ -1,9 +1,8 @@
 import type { GeoPoint } from '@/utility/w3w';
-import colors from '@styles/colors';
-import React, { useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Autolink, PhoneMatchersByCountry } from 'react-native-autolink';
 import LocationActionModal from '@/components/modals/LocationActionModal';
-import { parseGeoPoints } from '@/utility/geoTextParser';
+import { createGeoMatchers } from '@/utility/geoAutolinkMatchers';
 
 interface GeoLocationTextProps {
   text?: string | null;
@@ -15,37 +14,32 @@ export default function GeoLocationText({ text, style, selectable = true }: GeoL
   const [selectedGeoPoint, setSelectedGeoPoint] = useState<GeoPoint | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
+  const handleGeoPress = (geoPoint: GeoPoint) => {
+    setSelectedGeoPoint(geoPoint);
+    setModalVisible(true);
+  };
+
+  const matchers = useMemo(() => {
+    const geoMatchers = createGeoMatchers(handleGeoPress);
+    // Applying the US phone matcher so generic 10 digit numbers get parsed as phone numbers
+    return [...geoMatchers, PhoneMatchersByCountry.US];
+  }, []);
+
   if (!text) {
     return null;
   }
 
-  const tokens = parseGeoPoints(text);
-
-  const handleGeoPress = (geoPoint?: GeoPoint) => {
-    if (geoPoint) {
-      setSelectedGeoPoint(geoPoint);
-      setModalVisible(true);
-    }
-  };
-
   return (
     <>
-      <Text style={style} selectable={selectable}>
-        {tokens.map((token) => {
-          if (token.isGeoPoint && token.geoPoint) {
-            return (
-              <Text
-                key={`geo-link-${token.text}-${token.geoPoint.type}-${token.geoPoint.rawText}`}
-                style={styles.geoLink}
-                onPress={() => handleGeoPress(token.geoPoint)}
-              >
-                {token.text}
-              </Text>
-            );
-          }
-          return token.text;
-        })}
-      </Text>
+      <Autolink
+        text={text}
+        style={style}
+        selectable={selectable}
+        email
+        phone
+        url={{ schemeMatches: true, wwwMatches: true, tldMatches: false }}
+        matchers={matchers}
+      />
 
       {modalVisible && selectedGeoPoint && (
         <LocationActionModal
@@ -60,11 +54,3 @@ export default function GeoLocationText({ text, style, selectable = true }: GeoL
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  geoLink: {
-    color: colors.secondaryYellow,
-    textDecorationLine: 'underline',
-    fontWeight: '600',
-  },
-});
