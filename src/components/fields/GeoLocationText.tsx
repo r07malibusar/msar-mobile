@@ -39,11 +39,13 @@ export default function GeoLocationText({ text, style, selectable = true }: GeoL
   return (
     <>
       <Text style={style} selectable={selectable}>
-        {tokens.map((token) => {
+        {tokens.map((token, index) => {
+          const tokenKey = `token-${token.type}-${index}-${token.text}`;
+
           if ((token.type === 'w3w' || token.type === 'decimal' || token.type === 'ddm') && token.geoPoint) {
             return (
               <Text
-                key={`geo-link-${token.text}-${token.geoPoint.type}-${token.geoPoint.rawText}`}
+                key={tokenKey}
                 style={styles.geoLink}
                 onPress={() => handleGeoPress(token.geoPoint)}
               >
@@ -55,7 +57,7 @@ export default function GeoLocationText({ text, style, selectable = true }: GeoL
           if ((token.type === 'phone' || token.type === 'email' || token.type === 'url') && token.linkUrl) {
             return (
               <Text
-                key={`link-${token.type}-${token.text}-${token.linkUrl}`}
+                key={tokenKey}
                 style={styles.standardLink}
                 onPress={() => handleLinkPress(token.linkUrl)}
               >
@@ -64,7 +66,11 @@ export default function GeoLocationText({ text, style, selectable = true }: GeoL
             );
           }
 
-          return token.text;
+          return (
+            <Text key={tokenKey}>
+              {token.text}
+            </Text>
+          );
         })}
       </Text>
 
