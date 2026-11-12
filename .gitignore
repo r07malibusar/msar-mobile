@@ -52,6 +52,7 @@ yarn-error.*
 .idea/workspace.xml
 .idea/vcs.xml
 .idea/
+.artifacts/
 
 # local env files
 .env*.local
