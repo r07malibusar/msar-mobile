@@ -13,7 +13,7 @@ import { AuthProvider } from '@/components/AuthProvider';
 const routingInstrumentation = Sentry.reactNavigationIntegration();
 
 Sentry.init({
-  dsn: SentryDsn,
+  dsn: SentryDsn || undefined,
   sendDefaultPii: true,
   tracesSampleRate: 1.0,
   attachScreenshot: true,
