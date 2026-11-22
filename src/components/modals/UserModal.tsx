@@ -12,7 +12,7 @@ import { getPaddedDateString } from '@/utility/dateHelper';
 interface UserModalProps {
   user: user_detail;
   onCancel: () => void;
-};
+}
 
 function UserModal({ user, onCancel }: UserModalProps) {
   const certQuery = useCertsQuery(user.id);
@@ -34,6 +34,9 @@ function UserModal({ user, onCancel }: UserModalProps) {
           <InformationField title="Username" value={user.username} />
           <InformationField title="Status" value={user.status} />
           <InformationField title="Employee ID" value={user.employee_id} />
+          {!!user.radio_number && (
+            <InformationField title="Radio Number" value={user.radio_number} />
+          )}
         </InformationTray>
 
         <InformationTray

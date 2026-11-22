@@ -12,7 +12,7 @@ export interface user {
   full_name: string;
   username: string;
   mobile_phone?: string;
-};
+}
 
 export interface user_detail extends user {
   status: string;
@@ -24,6 +24,7 @@ export interface user_detail extends user {
   is_display: boolean;
   phone_numbers: phone[];
   employee_id: string;
+  radio_number?: string;
 }
 
 export interface member_status_type {
@@ -38,8 +39,9 @@ export interface member_status_type {
 }
 
 export function userToString(user?: user): string {
-  if (!user)
+  if (!user) {
     return 'System';
+  }
   return `${user.username} - ${user.full_name}`;
 }
 
@@ -52,8 +54,9 @@ export function compareUsername(a: user, b: user) {
 }
 
 export function isUserSelf(user?: user, self_username?: string): boolean {
-  if (!user)
+  if (!user) {
     return false;
+  }
 
   if (self_username) {
     return stringCompareIgnoreCase(self_username, user.username) === 0;
@@ -76,6 +79,7 @@ export function userDetailsFromResponse(memberResponse: any): user_detail {
     first_name: memberResponse.short_name,
     phone_numbers: memberResponse.phone_set?.map(phoneFromResponse),
     employee_id: memberResponse.emp,
+    radio_number: memberResponse.radio_number,
   };
 }
 
