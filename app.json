@@ -9,7 +9,7 @@
     "splash": {
       "image": "./src/assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#20242A"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -67,6 +67,7 @@
           "iosNSEFilePath": "./src/assets/native/NotificationService.m"
         }
       ],
+      "./plugins/w3w-expo-plugin.js",
       "expo-router",
       "@react-native-firebase/app",
       "@react-native-firebase/messaging",
@@ -74,21 +75,47 @@
         "expo-notifications",
         {
           "sounds": [
+            "src/assets/sounds/achievement.mp3",
+            "src/assets/sounds/aggressive.mp3",
+            "src/assets/sounds/aircraft_cabin.mp3",
+            "src/assets/sounds/alert_fade.mp3",
             "src/assets/sounds/beeprising.mp3",
+            "src/assets/sounds/bellhop.mp3",
+            "src/assets/sounds/bike_bell.mp3",
+            "src/assets/sounds/children.mp3",
+            "src/assets/sounds/chill_logo.mp3",
+            "src/assets/sounds/chime_steps.mp3",
+            "src/assets/sounds/dark_drone.mp3",
+            "src/assets/sounds/ding_through.mp3",
             "src/assets/sounds/distortion_1_time.mp3",
             "src/assets/sounds/distortion_3_times.mp3",
+            "src/assets/sounds/double_message.mp3",
+            "src/assets/sounds/emotional_classic.mp3",
+            "src/assets/sounds/grasso_wolf.mp3",
+            "src/assets/sounds/level_up.mp3",
             "src/assets/sounds/mdc_new_call.mp3",
+            "src/assets/sounds/modern_ring.mp3",
+            "src/assets/sounds/native_american.mp3",
+            "src/assets/sounds/pop.mp3",
             "src/assets/sounds/radio_1_time.mp3",
             "src/assets/sounds/radio_4_times.mp3",
+            "src/assets/sounds/rooster.mp3",
             "src/assets/sounds/serene_multi_ding.mp3",
             "src/assets/sounds/ships_bells.mp3",
             "src/assets/sounds/simple_ding.mp3",
+            "src/assets/sounds/success.mp3",
+            "src/assets/sounds/sunrise.mp3",
             "src/assets/sounds/sweet_1_time.mp3",
             "src/assets/sounds/sweet_6_times.mp3",
             "src/assets/sounds/trumpets_1_time.mp3",
             "src/assets/sounds/trumpets_4_times.mp3",
+            "src/assets/sounds/ultralight.mp3",
+            "src/assets/sounds/universal_new.mp3",
+            "src/assets/sounds/universal_up.mp3",
             "src/assets/sounds/uprising.mp3",
+            "src/assets/sounds/whoopsie.mp3",
             "src/assets/sounds/wooden_drum.mp3",
+            "src/assets/sounds/yeehaw.mp3",
             "src/assets/sounds/yucatan_1_time.mp3",
             "src/assets/sounds/yucatan_6_times.mp3"
           ]

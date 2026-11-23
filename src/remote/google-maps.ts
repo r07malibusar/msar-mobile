@@ -47,6 +47,25 @@ export async function geocodeAddress(address: string): Promise<geocodeAddressRes
     });
 }
 
+export async function reverseGeocodeCoordinates(lat: number, lon: number): Promise<string | null> {
+  if ((lat === 0 && lon === 0) || !GoogleAPIKey || GoogleAPIKey === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') {
+    return null;
+  }
+  const reverseGeocodingEndpoint = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}${keyParam}`;
+  try {
+    const res = await fetch(reverseGeocodingEndpoint);
+    const data = await res.json();
+    if (data.status === 'OK' && data.results && data.results.length > 0) {
+      return data.results[0].formatted_address;
+    }
+    return null;
+  }
+  catch (error) {
+    console.log('Reverse geocode error:', error);
+    return null;
+  }
+}
+
 // ADD COORDINATES
 function convertGeocodeToLocation(result: any): location {
   let streetNumber: string = '';

@@ -1,12 +1,13 @@
 import colors from '@styles/colors';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import GeoLocationText from '@/components/fields/GeoLocationText';
 
 interface TextAreaFieldProps {
   title?: string;
   value: string;
   valueColor?: string;
-};
+}
 
 function TextAreaField({ title, value, valueColor }: TextAreaFieldProps) {
   const textColor = valueColor || colors.primaryText;
@@ -16,19 +17,17 @@ function TextAreaField({ title, value, valueColor }: TextAreaFieldProps) {
       {!!title
         && <Text style={styles.titleText}>{title}</Text>}
       <View style={styles.valueContainer}>
-        <Text
+        <GeoLocationText
+          text={value}
           style={[styles.valueText, { color: textColor }]}
           selectable
-        >
-          {value}
-        </Text>
+        />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -44,7 +43,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
-
   },
   valueText: {
     fontSize: 16,

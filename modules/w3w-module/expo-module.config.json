@@ -1,0 +1,9 @@
+{
+  "platforms": ["ios", "android"],
+  "ios": {
+    "modules": ["W3WModule"]
+  },
+  "android": {
+    "modules": ["org.malibusar.app.w3w.W3WModule"]
+  }
+}

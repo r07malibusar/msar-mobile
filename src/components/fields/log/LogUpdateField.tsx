@@ -4,13 +4,14 @@ import { elements } from '@styles/elements';
 import { getConditionalTimeString } from '@utility/dateHelper';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import GeoLocationText from '@/components/fields/GeoLocationText';
 import { userToString } from '@/types/user';
 
 interface LogSystemFieldProps {
   member: user;
   update: string;
   timestamp: Date;
-};
+}
 
 function LogSystemField({ member, update, timestamp }: LogSystemFieldProps) {
   return (
@@ -18,9 +19,11 @@ function LogSystemField({ member, update, timestamp }: LogSystemFieldProps) {
       <Text style={[styles.valueText, { color: colors.grayText }]}>
         {userToString(member)}
       </Text>
-      <Text style={[elements.fieldText, { textAlign: 'center' }]} selectable>
-        {update}
-      </Text>
+      <GeoLocationText
+        text={update}
+        style={[elements.fieldText, { textAlign: 'center' }]}
+        selectable
+      />
       <Text style={styles.logTimestamp}>
         {getConditionalTimeString(timestamp)}
       </Text>
@@ -29,15 +32,12 @@ function LogSystemField({ member, update, timestamp }: LogSystemFieldProps) {
 }
 
 const styles = StyleSheet.create({
-
   container: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     marginVertical: 8,
   },
-
   valueText: {
-
     fontSize: 18,
     fontWeight: '400',
     fontStyle: 'italic',
@@ -45,7 +45,6 @@ const styles = StyleSheet.create({
     color: colors.primaryText,
   },
   logTimestamp: {
-
     marginTop: 8,
     fontSize: 12,
     fontWeight: '400',

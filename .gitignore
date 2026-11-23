@@ -12,6 +12,11 @@ credentials.json
 google-services.json
 GoogleService-Info.plist
 src/utility/constants.ts
+w3w-data.zip
+w3w-data/
+*.w3w
+*.xcframework
+*.aar
 /ios/
 /android/
 build/
@@ -44,6 +49,10 @@ yarn-error.*
 \#*\#
 .\#*
 .vscode/
+.idea/workspace.xml
+.idea/vcs.xml
+.idea/
+.artifacts/
 
 # local env files
 .env*.local
