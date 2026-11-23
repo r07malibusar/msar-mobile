@@ -7,13 +7,32 @@ export interface TextToken {
   linkUrl?: string;
 }
 
+const COMMON_DOMAIN_TLDS = new Set([
+  'com',
+  'org',
+  'edu',
+  'gov',
+  'net',
+  'io',
+  'co',
+  'us',
+  'info',
+  'html',
+  'php',
+  'aspx',
+  'mil',
+  'ca',
+  'uk',
+  'au',
+]);
+
 // Regex patterns
 const W3W_REGEX = /(?:\/\/\/|w3w[./]|w3w:|\b)([a-z]{2,})\.([a-z]{2,})\.([a-z]{2,})\b/gi;
 const DECIMAL_GPS_REGEX = /\b([-+]?(?:[0-8]?\d\.\d{3,}|90\.0+))[, ]+([-+]?(?:1[0-7]\d|\d)\.\d{3,}|180\.0+)\b/g;
 const DDM_GPS_REGEX = /\b([NS]?\d{1,2}°?\d{1,2}\.\d+'?[NS]?)[, ]+([EW]?\d{1,3}°?\d{1,2}\.\d+'?[EW]?)\b/gi;
 const US_PHONE_REGEX = /(?:\+?1[-. ]?)?\(?([2-9]\d{2})\)?[-. ]?(\d{3})[-. ]?(\d{4})\b/g;
 const EMAIL_REGEX = /\b[\w.%+-]+@[\w.-]+\.[A-Z]{2,}\b/gi;
-const URL_REGEX = /\b(?:https?:\/\/|www\.)[^\s<]+\b/gi;
+const URL_REGEX = /\b(?:https?:\/\/|www\.)[^\s<]+\b|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|org|edu|gov|net|io|co|us|info|html|php|aspx|mil|ca|uk|au)\b/gi;
 
 function parseDDMString(ddmStr: string): { latitude: number; longitude: number } | null {
   try {
@@ -60,25 +79,32 @@ export function parseGeoPoints(input: string): TextToken[] {
   let match = w3wRegexCopy.exec(input);
   while (match != null) {
     const rawText = match[0];
+    const prefix = rawText.match(/^(?:\/\/\/|w3w[./]|w3w:)/i)?.[0];
     const word1 = (match[1] || '').toLowerCase();
     const word2 = (match[2] || '').toLowerCase();
     const word3 = (match[3] || '').toLowerCase();
-    const w3wWords = `///${word1}.${word2}.${word3}`;
-    matches.push({
-      start: match.index,
-      end: match.index + rawText.length,
-      token: {
-        text: rawText,
-        type: 'w3w',
-        geoPoint: {
-          rawText,
+
+    // If no explicit W3W prefix AND 3rd word is a common web TLD -> treat as domain/URL, not W3W
+    const isDomain = !prefix && COMMON_DOMAIN_TLDS.has(word3);
+
+    if (!isDomain) {
+      const w3wWords = `///${word1}.${word2}.${word3}`;
+      matches.push({
+        start: match.index,
+        end: match.index + rawText.length,
+        token: {
+          text: rawText,
           type: 'w3w',
-          latitude: 0,
-          longitude: 0,
-          w3wWords,
+          geoPoint: {
+            rawText,
+            type: 'w3w',
+            latitude: 0,
+            longitude: 0,
+            w3wWords,
+          },
         },
-      },
-    });
+      });
+    }
     match = w3wRegexCopy.exec(input);
   }
 
@@ -170,12 +196,12 @@ export function parseGeoPoints(input: string): TextToken[] {
     match = emailRegexCopy.exec(input);
   }
 
-  // 6. Match URLs
+  // 6. Match URLs & Domains
   const urlRegexCopy = new RegExp(URL_REGEX);
   match = urlRegexCopy.exec(input);
   while (match != null) {
     const rawText = match[0];
-    const href = rawText.startsWith('www.') ? `https://${rawText}` : rawText;
+    const href = rawText.startsWith('www.') || !rawText.startsWith('http') ? `https://${rawText}` : rawText;
     matches.push({
       start: match.index,
       end: match.index + rawText.length,

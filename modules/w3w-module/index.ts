@@ -8,10 +8,13 @@ try {
 }
 catch (e) {
   console.warn('[W3W Module] Native W3WModule not linked:', e);
+  Sentry.captureException(e);
 }
 
 export async function convertTo3WA(lat: number, lon: number): Promise<string | null> {
   if (!NativeW3WModule?.convertTo3WA) {
+    console.warn('[W3W Module] convertTo3WA native function does not exist');
+    Sentry.captureMessage('[W3W Module] convertTo3WA native function does not exist');
     return null;
   }
   try {
@@ -27,6 +30,8 @@ export async function convertTo3WA(lat: number, lon: number): Promise<string | n
 
 export async function convertToCoordinates(words: string): Promise<{ latitude: number; longitude: number } | null> {
   if (!NativeW3WModule?.convertToCoordinates) {
+    console.warn('[W3W Module] convertToCoordinates native function does not exist');
+    Sentry.captureMessage('[W3W Module] convertToCoordinates native function does not exist');
     return null;
   }
   try {
